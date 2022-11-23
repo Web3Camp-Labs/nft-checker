@@ -2,7 +2,7 @@ import React, {ChangeEvent, useEffect, useState} from 'react';
 import styled from "styled-components";
 import HeaderTop from "./components/headTop";
 import FooterBox from "./components/footerBox";
-import { Container, Row, Col, Card,Form, FloatingLabel,Button} from 'react-bootstrap';
+import { Container, Row, Col, Card,Form, FloatingLabel,Button,Alert} from 'react-bootstrap';
 import GlobalStyle from "./utils/GloablStyle";
 import Api from "./api/apiHttp";
 import ERC721_ABI from "./abi/ERC721.json";
@@ -39,7 +39,7 @@ const CenterBox = styled.div`
 const GrayBox = styled.div`
     width: 100%;
     background: #f7f7f7;
-  padding: 40px 20px;
+  padding: 0 20px 40px;
   border-radius: 6px;
 `
 
@@ -51,6 +51,27 @@ const ImageBox = styled.div`
       width: 80%;
     }
 `
+const TopBox = styled.div`
+    position: fixed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+`
+
+const TypeTop = styled.div`
+    padding: 40px 0 20px;
+    border-bottom: 1px solid #ccc;
+  margin-bottom: 20px;
+`
+
+const NameBox = styled.div`
+    color: #000000;
+    padding-bottom: 20px;
+  font-size: 20px;
+`
 
 
 function App() {
@@ -61,7 +82,7 @@ function App() {
     const [type, setType] = useState('');
     const [metadata,setMetadata] = useState('');
     const [name,setName] = useState('');
-
+    const [errorTips,setErrorTips] = useState(false)
 
     useEffect(()=>{
         const { ethereum } = window as any;
@@ -83,14 +104,23 @@ function App() {
     const queryInfo = async() =>{
         const contract1155 = new ethers.Contract(address, ERC1155_ABI, web3Provider);
         console.log(contract1155)
-        const isERC1155 = await contract1155.supportsInterface('0xd9b67a26');
-        if(isERC1155){
-            setType('ERC1155')
-            Get1155();
-        }else{
-            setType('ERC721')
-            Get721();
+        try{
+            const isERC1155 = await contract1155.supportsInterface('0xd9b67a26');
+            if(isERC1155){
+                setType('ERC1155')
+                Get1155();
+            }else{
+                setType('ERC721')
+                Get721();
+            }
+        }catch (e:any){
+            console.log(e)
+            setErrorTips(true)
+            setTimeout(()=>{
+                setErrorTips(false)
+            },2000)
         }
+
         // console.log(owner)
         // const bal = await contract721.balanceOf(owner)
         // console.log(bal)
@@ -167,6 +197,14 @@ function App() {
       <div>
         <MainContent>
           <HeaderTop />
+            {
+                errorTips && <TopBox>
+                    <Alert variant='danger'>
+                        Please confirm the right chain
+                    </Alert>
+                </TopBox>
+            }
+
           <ContentBox>
             <Row>
                 <CardBox body>
@@ -209,13 +247,12 @@ function App() {
                     <CenterBox>
                         <Col  md={8} xs={12}>
                             <GrayBox>
-                                <div>{type}</div>
+                                <TypeTop>{type}</TypeTop>
+                                <NameBox>{name}</NameBox>
                                 <div>
                                     Metadata: {metadata}
                                 </div>
-                                <div>
-                                    {name}
-                                </div>
+
                                 <ImageBox>
                                     <img src={image} alt=""/>
                                 </ImageBox>
