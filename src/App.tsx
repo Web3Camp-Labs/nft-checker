@@ -4,12 +4,10 @@ import HeaderTop from "./components/headTop";
 import FooterBox from "./components/footerBox";
 import { Container, Row, Col, Card,Form, FloatingLabel,Button,Alert} from 'react-bootstrap';
 import GlobalStyle from "./utils/GloablStyle";
-import Api from "./api/apiHttp";
 import ERC721_ABI from "./abi/ERC721.json";
 import ERC1155_ABI from "./abi/erc1155-abi.json";
 import {ethers} from 'ethers';
 import api from "./api/apiHttp";
-import ChainJson from "./api/chain.json";
 
 const MainContent = styled.div`
   display: flex;
