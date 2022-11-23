@@ -29,13 +29,14 @@ export default function HeaderTop() {
             window.location.reload();
 
         });
+        const getChain =  async() =>{
+            const { chainId } = await web3Provider.getNetwork();
+            const ChainArr = ChainJson.filter(item=>item.chainId === chainId);
+            setChainName(ChainArr[0]?.name);
+        }
         getChain();
     },[])
-    const getChain =  async() =>{
-        const { chainId } = await web3Provider.getNetwork();
-        const ChainArr = ChainJson.filter(item=>item.chainId === chainId);
-        setChainName(ChainArr[0]?.name);
-    }
+
 
     return <div className="header">
         <Container>
