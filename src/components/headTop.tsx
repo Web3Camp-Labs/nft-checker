@@ -20,8 +20,7 @@ const AddressBox = styled.span`
 export default function HeaderTop() {
     const [chainName ,setChainName] = useState('');
 
-    const { ethereum } = window as any;
-    const web3Provider = new ethers.providers.Web3Provider(ethereum);
+
 
     useEffect(()=>{
         const { ethereum} = window as any;
@@ -30,6 +29,8 @@ export default function HeaderTop() {
 
         });
         const getChain =  async() =>{
+            const { ethereum } = window as any;
+            const web3Provider = new ethers.providers.Web3Provider(ethereum);
             const { chainId } = await web3Provider.getNetwork();
             const ChainArr = ChainJson.filter(item=>item.chainId === chainId);
             setChainName(ChainArr[0]?.name);
