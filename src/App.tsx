@@ -84,8 +84,12 @@ function App() {
 
     useEffect(()=>{
         const { ethereum } = window as any;
+        if(typeof ethereum == 'undefined'){
+            return;
+        }
         const web3Instance = new ethers.providers.Web3Provider(ethereum);
         setWeb3Provider(web3Instance);
+
     },[])
 
 

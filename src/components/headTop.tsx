@@ -20,16 +20,20 @@ const AddressBox = styled.span`
 export default function HeaderTop() {
     const [chainName ,setChainName] = useState('');
 
-
-
     useEffect(()=>{
         const { ethereum} = window as any;
+        if(typeof ethereum == 'undefined'){
+            return;
+        }
         ethereum.on('chainChanged', () => {
             window.location.reload();
 
         });
         const getChain =  async() =>{
             const { ethereum } = window as any;
+            if(typeof ethereum == 'undefined'){
+                return;
+            }
             const web3Provider = new ethers.providers.Web3Provider(ethereum);
             const { chainId } = await web3Provider.getNetwork();
             const ChainArr = ChainJson.filter(item=>item.chainId === chainId);
@@ -43,7 +47,14 @@ export default function HeaderTop() {
         <Container>
             <Row>
                 <Col className="headerTxt" md={8} xs={12}>NFT Checker</Col>
-                <Col className="headetRht" md={4} xs={12}><AddressBox>{chainName}</AddressBox></Col>
+                <Col className="headetRht" md={4} xs={12}>
+                    {
+                        chainName && <AddressBox>{chainName}</AddressBox>
+                    }
+                    {
+                       ! chainName && <div>Please install MetaMask</div>
+                    }
+                </Col>
             </Row>
         </Container>
     </div>
