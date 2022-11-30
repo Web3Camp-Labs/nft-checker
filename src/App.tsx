@@ -70,7 +70,32 @@ const NameBox = styled.div`
     padding-bottom: 20px;
   font-size: 20px;
 `
+const PBox = styled.div`
+    display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  .tabBox{
+     background: #fff;
+    border-radius: 6px;
+    box-shadow: 0 0 5px #ccc;
+    margin-left: 10px;
+    dt{
+      opacity: 0.6;
+      font-size: 11px;
+      width: 100%;
+      padding: 10px 20px;
+      border-bottom: 1px solid #ccc;
+    }
+    dd{
+      padding: 10px 20px;
+    }
+  }
+`
 
+interface propertyObj{
+    name:string;
+    value:string;
+}
 
 function App() {
     const [address,setAddress] = useState('');
@@ -80,7 +105,9 @@ function App() {
     const [type, setType] = useState('');
     const [metadata,setMetadata] = useState('');
     const [name,setName] = useState('');
-    const [errorTips,setErrorTips] = useState(false)
+    const [errorTips,setErrorTips] = useState(false);
+    const [properties,setProperties] = useState<any>({});
+    const [pArr,setPArr] = useState<propertyObj[]>([]);
 
     useEffect(()=>{
         const { ethereum } = window as any;
@@ -90,7 +117,19 @@ function App() {
         const web3Instance = new ethers.providers.Web3Provider(ethereum);
         setWeb3Provider(web3Instance);
 
-    },[])
+    },[]);
+
+    useEffect(()=>{
+        let arr = [];
+        for(let key in properties){
+            arr.push({
+                name:key,
+                value: properties[key]
+            })
+        }
+        setPArr(arr)
+
+    },[properties])
 
 
     const handleInput = (e:ChangeEvent) => {
@@ -151,19 +190,40 @@ function App() {
 
         if(!web3Provider) return;
         const nftContract = new ethers.Contract(address, ERC721_ABI, web3Provider);
-        console.log(nftContract,token)
         const tokenURI = await nftContract.tokenURI(token);
-        setMetadata(tokenURI)
+        setMetadata(tokenURI);
+        console.log(tokenURI)
 
         if(tokenURI.indexOf('metadata')>-1){
             let data = await api.getData(tokenURI);
             const image = data.data.image;
+            setProperties(data.data?.properties)
             setImage(image);
+            setName(data.data?.name);
         }else{
-            let tokenAddr = tokenURI.split("ipfs://")[1];
-            const result = await api.getHash(`https://ipfs.io/ipfs/${tokenAddr}`);
-            const image = result.data?.image.split("ipfs://")[1];
-            const imageUrl = `https://ipfs.io/ipfs/${image}`;
+            let tokenAddr;
+            let url;
+            if(tokenURI.indexOf("ipfs://")>-1){
+                tokenAddr = tokenURI.split("ipfs://")[1];
+                url = `https://ipfs.io/ipfs/${tokenAddr}`
+            }else{
+                url =tokenURI;
+            }
+
+            const result = await api.getHash(`${url}`);
+            setName(result.data?.name);
+            setProperties(result.data?.properties)
+            let image;
+            let imageUrl;
+            if(result.data?.image.indexOf("ipfs://")>-1){
+              image = result.data?.image.split("ipfs://")[1];
+              imageUrl = `https://ipfs.io/ipfs/${image}`;
+            }else{
+                image = result.data?.image;
+                imageUrl = image;
+            }
+
+
             setImage(imageUrl);
         }
 
@@ -171,32 +231,42 @@ function App() {
     const Get1155 = async ()=>{
         setImage('');
         setMetadata('');
+        setName('');
 
         if(!web3Provider) return;
         const nftContract = new ethers.Contract(address, ERC1155_ABI, web3Provider);
         let tokenURI = await nftContract.uri(token);
+        console.error(tokenURI)
 
         if(tokenURI.indexOf('0x{id}')>-1){
             let url = tokenURI.split('0x{id}')[0];
             let data = await api.getData(`${url}${token}`);
-            console.error(data)
             setMetadata(`${url}${token}`);
             const image = data.data.image;
+            setProperties(data.data?.properties)
             setImage(image);
             setName(data.data.name);
         }else{
-            if(tokenURI.indexOf("ipfs://") === -1){
+
+            if(tokenURI.indexOf("://") === -1){
                 tokenURI = `https://ipfs.io/ipfs/${tokenURI}`;
             }
+
             const result = await api.getHash(tokenURI);
+            setProperties(result.data?.properties )
             setMetadata(tokenURI);
             let image;
+            let imageUrl;
+            console.log(result.data?.image)
+            setName(result.data?.name);
             if(result.data?.image.indexOf('ipfs')>-1){
                 image = result.data?.image.split("ipfs://")[1];
+                 imageUrl = `https://ipfs.io/ipfs/${image}`;
             }else{
                 image = result.data?.image;
+                imageUrl = image;
             }
-            const imageUrl = `https://ipfs.io/ipfs/${image}`;
+
             setImage(imageUrl);
         }
     }
@@ -260,6 +330,19 @@ function App() {
                                 <div>
                                     Metadata: {metadata}
                                 </div>
+                                {
+                                    !!pArr.length &&<PBox>
+                                        <div>Properties: </div>
+                                        {
+                                            pArr.map((item)=>(<dl className="tabBox" key={item.name}>
+                                                    <dt>{item.name}</dt>
+                                                    <dd>{item.value}</dd>
+                                                </dl>
+                                            ))
+                                        }
+
+                                    </PBox>
+                                }
 
                                 <ImageBox>
                                     <img src={image} alt=""/>
