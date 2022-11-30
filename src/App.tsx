@@ -154,8 +154,8 @@ function App() {
         console.log(nftContract,token)
         const tokenURI = await nftContract.tokenURI(token);
         setMetadata(tokenURI)
+
         if(tokenURI.indexOf('metadata')>-1){
-            console.log("=====",tokenURI)
             let data = await api.getData(tokenURI);
             const image = data.data.image;
             setImage(image);
@@ -174,22 +174,28 @@ function App() {
 
         if(!web3Provider) return;
         const nftContract = new ethers.Contract(address, ERC1155_ABI, web3Provider);
-        console.log(nftContract)
-        const tokenURI = await nftContract.uri(token);
-
+        let tokenURI = await nftContract.uri(token);
 
         if(tokenURI.indexOf('0x{id}')>-1){
-            let url = tokenURI.split('0x{id}')[0]
+            let url = tokenURI.split('0x{id}')[0];
             let data = await api.getData(`${url}${token}`);
-            setMetadata(`${url}${token}`)
+            console.error(data)
+            setMetadata(`${url}${token}`);
             const image = data.data.image;
             setImage(image);
             setName(data.data.name);
         }else{
-            setMetadata(tokenURI)
+            if(tokenURI.indexOf("ipfs://") === -1){
+                tokenURI = `https://ipfs.io/ipfs/${tokenURI}`;
+            }
             const result = await api.getHash(tokenURI);
-            console.log(result)
-            const image = result.data?.image.split("ipfs://")[1];
+            setMetadata(tokenURI);
+            let image;
+            if(result.data?.image.indexOf('ipfs')>-1){
+                image = result.data?.image.split("ipfs://")[1];
+            }else{
+                image = result.data?.image;
+            }
             const imageUrl = `https://ipfs.io/ipfs/${image}`;
             setImage(imageUrl);
         }
