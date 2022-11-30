@@ -187,6 +187,7 @@ function App() {
     const Get721 = async() =>{
         setImage('');
         setMetadata('');
+        setName('');
 
         if(!web3Provider) return;
         const nftContract = new ethers.Contract(address, ERC721_ABI, web3Provider);
@@ -236,7 +237,6 @@ function App() {
         if(!web3Provider) return;
         const nftContract = new ethers.Contract(address, ERC1155_ABI, web3Provider);
         let tokenURI = await nftContract.uri(token);
-        console.error(tokenURI)
 
         if(tokenURI.indexOf('0x{id}')>-1){
             let url = tokenURI.split('0x{id}')[0];
@@ -250,8 +250,11 @@ function App() {
 
             if(tokenURI.indexOf("://") === -1){
                 tokenURI = `https://ipfs.io/ipfs/${tokenURI}`;
+            }else{
+                if(tokenURI.indexOf("ipfs://") > -1){
+                    tokenURI = `https://ipfs.io/ipfs/${tokenURI.split("ipfs://")[1]}`;
+                }
             }
-
             const result = await api.getHash(tokenURI);
             setProperties(result.data?.properties )
             setMetadata(tokenURI);
