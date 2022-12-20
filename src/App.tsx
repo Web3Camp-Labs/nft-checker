@@ -5,7 +5,7 @@ import FooterBox from "./components/footerBox";
 import { Container, Row, Col, Card,Form, FloatingLabel,Button,Alert} from 'react-bootstrap';
 import GlobalStyle from "./utils/GloablStyle";
 import ERC721_ABI from "./abi/ERC721.json";
-import ERC1155_ABI from "./abi/erc1155-abi.json";
+import ERC1155_ABI from "./abi/ERC1155.json";
 import {ethers} from 'ethers';
 import api from "./api/apiHttp";
 
