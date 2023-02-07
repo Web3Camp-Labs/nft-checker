@@ -1,13 +1,14 @@
 {
   "files": {
     "main.css": "./static/css/main.c2cab247.css",
-    "main.js": "./static/js/main.a9974b59.js",
+    "main.js": "./static/js/main.5f5de285.js",
+    "static/media/nft-checker.png": "./static/media/nft-checker.a44f4bdee61e5ea052dd.png",
     "index.html": "./index.html",
     "main.c2cab247.css.map": "./static/css/main.c2cab247.css.map",
-    "main.a9974b59.js.map": "./static/js/main.a9974b59.js.map"
+    "main.5f5de285.js.map": "./static/js/main.5f5de285.js.map"
   },
   "entrypoints": [
     "static/css/main.c2cab247.css",
-    "static/js/main.a9974b59.js"
+    "static/js/main.5f5de285.js"
   ]
 }
