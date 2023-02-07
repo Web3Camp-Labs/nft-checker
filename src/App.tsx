@@ -8,6 +8,8 @@ import ERC721_ABI from "./abi/ERC721.json";
 import ERC1155_ABI from "./abi/ERC1155.json";
 import {ethers} from 'ethers';
 import api from "./api/apiHttp";
+import ChainJson from "./api/chain.json";
+import NftLogo from "./assets/nft-checker.png";
 
 const MainContent = styled.div`
   display: flex;
@@ -92,6 +94,52 @@ const PBox = styled.div`
   }
 `
 
+const AddressBox = styled.span`
+    border: 1px solid #000;
+    font-size: 16px;
+    height: 40px;
+  line-height: 40px;
+  border-radius: 5px;
+  display: inline-block;
+  white-space: nowrap;
+  padding: 0 20px;
+  color: #000000;
+`
+
+const TopLine = styled.div`
+    margin:-20px -12px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`
+const Lft = styled.div`
+    display: flex;
+  align-items: center;
+  .imgBox{
+    width: 96px;
+    height: 96px;
+    background: #fff;
+    border-radius: 20px;
+    border: 1px solid #EDEFF0;
+    padding: 13px;
+    margin-right: 16px;
+    box-sizing: border-box;
+    img{
+      max-width: 100%;
+      max-height: 100%;
+    }
+  }
+`
+const TitleBox = styled.div`
+  font-family: Helvetica;
+  font-size: 16px;
+  .tit{
+    font-size: 18px;
+    line-height: 22px;
+    font-weight: bold;
+  }
+`
+
 interface propertyObj{
     name:string;
     value:string;
@@ -108,6 +156,29 @@ function App() {
     const [errorTips,setErrorTips] = useState(false);
     const [properties,setProperties] = useState<any>({});
     const [pArr,setPArr] = useState<propertyObj[]>([]);
+    const [chainName ,setChainName] = useState('');
+
+    useEffect(()=>{
+        const { ethereum} = window as any;
+        if(typeof ethereum == 'undefined'){
+            return;
+        }
+        ethereum.on('chainChanged', () => {
+            window.location.reload();
+
+        });
+        const getChain =  async() =>{
+            const { ethereum } = window as any;
+            if(typeof ethereum == 'undefined'){
+                return;
+            }
+            const web3Provider = new ethers.providers.Web3Provider(ethereum);
+            const { chainId } = await web3Provider.getNetwork();
+            const ChainArr = ChainJson.filter(item=>item.chainId === chainId);
+            setChainName(ChainArr[0]?.name);
+        }
+        getChain();
+    },[])
 
     useEffect(()=>{
         const { ethereum } = window as any;
@@ -287,6 +358,23 @@ function App() {
             }
 
           <ContentBox>
+              <TopLine>
+                  <Lft>
+                      <div className="imgBox"><img src={NftLogo} alt=""/></div>
+                      <TitleBox>
+                          <div className="tit">NFT Checker</div>
+                          <div>Verify and Source NFT Metadata</div>
+                      </TitleBox>
+                  </Lft>
+                  <div className="rht">
+                      {
+                          chainName && <AddressBox>{chainName}</AddressBox>
+                      }
+                      {
+                          ! chainName && <div>Please install MetaMask</div>
+                      }
+                  </div>
+              </TopLine>
             <Row>
                 <CardBox body>
                     <CenterBox>
