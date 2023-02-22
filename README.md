@@ -1,5 +1,7 @@
 # NFT-Checker
 
+Verify and Source NFT Metadata
+
 ## Available Scripts
 
 In the project directory, you can run:
