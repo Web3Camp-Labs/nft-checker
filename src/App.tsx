@@ -157,6 +157,7 @@ function App() {
     const [properties,setProperties] = useState<any>({});
     const [pArr,setPArr] = useState<propertyObj[]>([]);
     const [chainName ,setChainName] = useState('');
+    const [svgShow ,setSvgShow] = useState(false);
 
     useEffect(()=>{
         const { ethereum} = window as any;
@@ -266,12 +267,19 @@ function App() {
         setMetadata(tokenURI);
         console.log(tokenURI)
 
+
+
         if(tokenURI.indexOf('metadata')>-1){
             let data = await api.getData(tokenURI);
             const image = data.data.image;
             setProperties(data.data?.properties)
             setImage(image);
             setName(data.data?.name);
+            setSvgShow(false)
+        }else if(tokenURI.indexOf('svg')>-1){
+            console.error(tokenURI)
+            setImage(tokenURI);
+            setSvgShow(true)
         }else{
             let tokenAddr;
             let url;
@@ -281,7 +289,6 @@ function App() {
             }else{
                 url =tokenURI;
             }
-
             const result = await api.getHash(`${url}`);
             setName(result.data?.name);
             setProperties(result.data?.properties)
@@ -295,7 +302,7 @@ function App() {
                 imageUrl = image;
             }
 
-
+            setSvgShow(false)
             setImage(imageUrl);
         }
 
@@ -317,8 +324,10 @@ function App() {
             setProperties(data.data?.properties)
             setImage(image);
             setName(data.data.name);
+        }else if(tokenURI.indexOf('svg')>-1){
+            setImage(tokenURI);
+            setSvgShow(true)
         }else{
-
             if(tokenURI.indexOf("://") === -1){
                 tokenURI = `https://ipfs.io/ipfs/${tokenURI}`;
             }else{
@@ -435,9 +444,15 @@ function App() {
                                     </PBox>
                                 }
 
-                                <ImageBox>
-                                    <img src={image} alt=""/>
-                                </ImageBox>
+                                {
+                                   !svgShow && <ImageBox>
+                                        <img src={image} alt=""/>
+                                    </ImageBox>
+                                }
+                                {
+                                    svgShow && <ImageBox dangerouslySetInnerHTML={{__html: image}} />
+                                }
+
 
 
                             </GrayBox>
