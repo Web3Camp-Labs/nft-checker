@@ -352,13 +352,14 @@ function Home() {
                 return ''
             }
         })
-        let mylist = [...newArr];
-        setList(mylist.splice(0,5))
-        return newArr
+
+        return newArr;
     }
 
     const HistoryRecord = () =>{
         const newArr = getHistory();
+        let mylist = [...newArr];
+        setList(mylist.splice(0,5))
         localStorage.setItem('history',JSON.stringify(newArr));
     }
 
