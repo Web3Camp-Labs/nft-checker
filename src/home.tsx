@@ -205,21 +205,31 @@ function Home() {
     const switchChain = async () =>{
         const { ethereum} = window as any;
 
-        const ChainArr:any = ChainJson.filter(item=>item.chainId === Number(chainIdstr));
-        const { chain,nativeCurrency:{name,symbol,decimals},rpc,explorers,chainId } = ChainArr[0];
+        console.log(chainIdstr)
 
+        const ChainArr:any = ChainJson.filter(item=>item.chainId === Number(chainIdstr));
+        console.log(ChainArr)
+        const { chain,nativeCurrency:{name,symbol,decimals},rpc,explorers,chainId } = ChainArr[0];
+        console.log(ChainArr[0])
+
+        // ethereum.request({
+        //     method: 'wallet_addEthereumChain',
+        //     params: [{
+        //         chainId:`0x${chainId.toString(16)}`,
+        //         chainName:chain,
+        //         nativeCurrency: {
+        //             name,
+        //             symbol,
+        //             decimals
+        //         },
+        //         rpcUrls:rpc,
+        //         blockExplorerUrls:[explorers[0]?.url]
+        //     }]
+        // })
         ethereum.request({
-            method: 'wallet_addEthereumChain',
+            method: "wallet_switchEthereumChain",
             params: [{
-                chainId:`0x${chainId.toString(16)}`,
-                chainName:chain,
-                nativeCurrency: {
-                    name,
-                    symbol,
-                    decimals
-                },
-                rpcUrls:rpc,
-                blockExplorerUrls:[explorers[0]?.url]
+                chainId: `0x${chainId.toString(16)}`
             }]
         })
         .catch((error:any) => {
@@ -229,12 +239,7 @@ function Home() {
 
 
 
-        // ethereum.request({
-        //     method: "wallet_switchEthereumChain",
-        //     params: [{
-        //         chainId: "0x1"
-        //     }]
-        // })
+
 
     }
 
