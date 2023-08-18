@@ -20,6 +20,12 @@ const MainContent = styled.div`
   .liBox,.li{
     margin-bottom: 40px;
   }
+  .btn{
+    background-color: purple;
+    color: white;
+    font-family: "Helvetica";
+    border: 0;
+  }
 `
 
 const ContentBox = styled(Container)`
@@ -276,6 +282,7 @@ function Home() {
         setAddress(nftadd);
         setToken(id)
         queryInfo()
+
     }, [id,nftadd,web3Provider,chainId]);
 
     useEffect(()=>{
@@ -285,7 +292,7 @@ function Home() {
         }
         const web3Instance = new ethers.providers.Web3Provider(ethereum);
         setWeb3Provider(web3Instance);
-
+        getHistory()
     },[]);
 
     useEffect(()=>{
@@ -317,11 +324,12 @@ function Home() {
         }
     }
     const toGo =() =>{
-        navigate(`/${chainId}/${address}/${token}`)
+        navigate(`/nft-checker/${chainId}/${address}/${token}`)
         return;
     }
 
-    const HistoryRecord = () =>{
+    const  getHistory = () =>{
+
         let arr= localStorage.getItem('history');
         let MyArr:any[] = []
         if(arr){
@@ -346,6 +354,11 @@ function Home() {
         })
         let mylist = [...newArr];
         setList(mylist.splice(0,5))
+        return newArr
+    }
+
+    const HistoryRecord = () =>{
+        const newArr = getHistory();
         localStorage.setItem('history',JSON.stringify(newArr));
     }
 
@@ -499,8 +512,8 @@ function Home() {
         if(after>-1){
             arrFormat.splice(after,1);
             console.log(arrFormat)
-            // localStorage.setItem('history',JSON.stringify(arrFormat))
-            // setList()
+            localStorage.setItem('history',JSON.stringify(arrFormat))
+            setList(arrFormat);
             console.log(arrFormat)
         }
 
@@ -657,7 +670,7 @@ function Home() {
                                                 {getName(item.chain)} --{item.id}
                                                 <X />
                                             </div>
-                                            <div onClick={()=>toGONew(`/${item.chain}/${item.address}/${item.id}`)}>
+                                            <div onClick={()=>toGONew(`/nft-checker/${item.chain}/${item.address}/${item.id}`)}>
                                                 {
                                                     `${window.location.host}/nft-checker/${item.chain}/${item.address}/${item.id}`
                                                 }
