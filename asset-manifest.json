@@ -1,14 +1,14 @@
 {
   "files": {
-    "main.css": "./static/css/main.99e4cf39.css",
-    "main.js": "./static/js/main.ff63bf4d.js",
-    "static/media/nft-checker.png": "./static/media/nft-checker.a44f4bdee61e5ea052dd.png",
-    "index.html": "./index.html",
-    "main.99e4cf39.css.map": "./static/css/main.99e4cf39.css.map",
-    "main.ff63bf4d.js.map": "./static/js/main.ff63bf4d.js.map"
+    "main.css": "/nft-checker/static/css/main.99e4cf39.css",
+    "main.js": "/nft-checker/static/js/main.b7eeca92.js",
+    "static/media/nft-checker.png": "/nft-checker/static/media/nft-checker.a44f4bdee61e5ea052dd.png",
+    "index.html": "/nft-checker/index.html",
+    "main.99e4cf39.css.map": "/nft-checker/static/css/main.99e4cf39.css.map",
+    "main.b7eeca92.js.map": "/nft-checker/static/js/main.b7eeca92.js.map"
   },
   "entrypoints": [
     "static/css/main.99e4cf39.css",
-    "static/js/main.ff63bf4d.js"
+    "static/js/main.b7eeca92.js"
   ]
 }
