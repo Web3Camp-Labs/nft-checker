@@ -11,7 +11,7 @@ import {ethers} from 'ethers';
 import api from "./api/apiHttp";
 import ChainJson from "./api/chain.json";
 import NftLogo from "./assets/nft-checker.png";
-import {useLocation, useNavigate, useParams} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 
 const MainContent = styled.div`
   display: flex;
@@ -112,17 +112,6 @@ const PBox = styled.div`
   }
 `
 
-const AddressBox = styled.span`
-    border: 1px solid #000;
-    font-size: 16px;
-    height: 40px;
-  line-height: 40px;
-  border-radius: 5px;
-  display: inline-block;
-  white-space: nowrap;
-  padding: 0 20px;
-  color: #000000;
-`
 
 const TopLine = styled.div`
     margin:-20px -12px 20px;
