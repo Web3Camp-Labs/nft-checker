@@ -324,7 +324,7 @@ function Home() {
         }
     }
     const toGo =() =>{
-        navigate(`/nft-checker/${chainId}/${address}/${token}`)
+        navigate(`/${chainId}/${address}/${token}`)
         return;
     }
 
@@ -671,9 +671,9 @@ function Home() {
                                                 {getName(item.chain)} --{item.id}
                                                 <X />
                                             </div>
-                                            <div onClick={()=>toGONew(`/nft-checker/${item.chain}/${item.address}/${item.id}`)}>
+                                            <div onClick={()=>toGONew(`/${item.chain}/${item.address}/${item.id}`)}>
                                                 {
-                                                    `${window.location.host}/nft-checker/${item.chain}/${item.address}/${item.id}`
+                                                    `${window.location.host}/#/${item.chain}/${item.address}/${item.id}`
                                                 }
                                             </div>
 
