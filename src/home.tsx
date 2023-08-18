@@ -278,7 +278,7 @@ function Home() {
     }
 
     useEffect(() => {
-        if(id==="all" ||nftadd==="add" || !id || !nftadd ||!web3Provider || !chainIdstr || !chainId) return;
+        if(id==="all" ||nftadd==="all" || !id || !nftadd ||!web3Provider || !chainIdstr || !chainId) return;
         setAddress(nftadd);
         setToken(id)
         queryInfo()
@@ -296,6 +296,7 @@ function Home() {
     },[]);
 
     useEffect(()=>{
+
         let arr = [];
         for(let key in properties){
             console.log(key,properties[key])
@@ -329,17 +330,20 @@ function Home() {
     }
 
     const  getHistory = () =>{
-
         let arr= localStorage.getItem('history');
         let MyArr:any[] = []
         if(arr){
             MyArr = JSON.parse(arr!)
         }
-        MyArr.push({
-            chain:chainIdstr,
-            address:nftadd,
-            id
-        })
+        console.error(MyArr)
+        if(id!=="all" && nftadd!=="all" && chainIdstr!=="all") {
+            MyArr.push({
+                chain:chainIdstr,
+                address:nftadd,
+                id
+            })
+        }
+
 
         let newArr:any[] = [];
         MyArr.forEach((item) => {
@@ -352,14 +356,15 @@ function Home() {
                 return ''
             }
         })
-
+        let mylist = [...newArr];
+        setList(mylist.splice(0,5))
         return newArr;
     }
 
     const HistoryRecord = () =>{
         const newArr = getHistory();
-        let mylist = [...newArr];
-        setList(mylist.splice(0,5))
+        // let mylist = [...newArr];
+        // setList(mylist.splice(0,5))
         localStorage.setItem('history',JSON.stringify(newArr));
     }
 
