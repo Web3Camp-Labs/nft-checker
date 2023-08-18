@@ -204,13 +204,11 @@ function Home() {
 
     const switchChain = async () =>{
         const { ethereum} = window as any;
-
-        console.log(chainIdstr)
+        
 
         const ChainArr:any = ChainJson.filter(item=>item.chainId === Number(chainIdstr));
-        console.log(ChainArr)
-        const { chain,nativeCurrency:{name,symbol,decimals},rpc,explorers,chainId } = ChainArr[0];
-        console.log(ChainArr[0])
+        // const { chain,nativeCurrency:{name,symbol,decimals},rpc,explorers,chainId } = ChainArr[0];
+        const { chainId } = ChainArr[0];
 
         // ethereum.request({
         //     method: 'wallet_addEthereumChain',
