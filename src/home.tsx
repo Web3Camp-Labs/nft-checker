@@ -29,7 +29,7 @@ const CardBox = styled(Card)`
   border:0;
   box-shadow: 0 0 5px #ccc;
   border-radius: 6px;
-  padding: 40px;
+  padding: 40px ;
 `
 
 const CenterBox = styled.div`
@@ -59,6 +59,7 @@ const GrayBox = styled.div`
     background: #f7f7f7;
   padding: 0 20px 40px;
   border-radius: 6px;
+  word-break: break-all;
 `
 
 const ImageBox = styled.div`
@@ -147,6 +148,31 @@ const TitleBox = styled.div`
   }
 `
 
+const HistoryBox = styled.div`
+  padding-left: 20px;
+    .titleRht{
+      font-weight: bold;
+      color: #000;
+      font-size: 1.2rem;
+      margin-bottom: 20px;
+    }
+  .close{
+    padding-top: 10px;
+    text-align: right;
+    padding-bottom: 10px;
+    
+  }
+  ul{
+    li{
+      background: #f8f8f8;
+      padding:0 20px 20px;
+      box-shadow: 0 0 5px #ccc;
+      border-radius: 5px;
+      margin-bottom: 20px;
+    }
+  }
+`
+
 interface propertyObj{
     name:string;
     value:string;
@@ -172,6 +198,7 @@ function Home() {
     const [svgShow ,setSvgShow] = useState(false);
     const [chainId ,setChainId] = useState('');
     const [show ,setShow] = useState(false);
+    const [list,setList] = useState<any[]>([])
 
     useEffect(()=>{
         if(!web3Provider) return;
@@ -185,6 +212,12 @@ function Home() {
         });
         getChain();
     },[web3Provider,chainIdstr])
+
+    const getName = (chainId:number) =>{
+        const ChainArr = ChainJson.filter(item=>item.chainId === Number(chainId));
+        return(ChainArr[0]?.name);
+
+    }
     const getChain =  async() =>{
         const { ethereum } = window as any;
         if(typeof ethereum == 'undefined'){
@@ -196,15 +229,17 @@ function Home() {
         }else{
             setShow(false);
         }
-        setChainId(chainId)
-        const ChainArr = ChainJson.filter(item=>item.chainId === chainId);
-        setChainName(ChainArr[0]?.name);
+        setChainId(chainId);
+
+
+        const ChainArr =   getName(chainId);
+        setChainName(ChainArr);
     }
 
 
     const switchChain = async () =>{
         const { ethereum} = window as any;
-        
+
 
         const ChainArr:any = ChainJson.filter(item=>item.chainId === Number(chainIdstr));
         // const { chain,nativeCurrency:{name,symbol,decimals},rpc,explorers,chainId } = ChainArr[0];
@@ -234,11 +269,6 @@ function Home() {
             // dispatch({type:ActionType.SET_ERROR,payload:{msg:'Please take the right chain',type:'error'}  });
             console.log(error)
         })
-
-
-
-
-
     }
 
     useEffect(() => {
@@ -261,11 +291,17 @@ function Home() {
     useEffect(()=>{
         let arr = [];
         for(let key in properties){
-            arr.push({
-                name:key,
-                value: properties[key]
-            })
+            console.log(key,properties[key])
+            if(typeof properties[key] === "string"){
+                arr.push({
+                    name:key,
+                    value: properties[key]
+                })
+            }
+
+
         }
+        console.log(arr)
         setPArr(arr)
 
     },[properties])
@@ -285,6 +321,34 @@ function Home() {
         return;
     }
 
+    const HistoryRecord = () =>{
+        let arr= localStorage.getItem('history');
+        let MyArr:any[] = []
+        if(arr){
+            MyArr = JSON.parse(arr!)
+        }
+        MyArr.push({
+            chain:chainIdstr,
+            address:nftadd,
+            id
+        })
+
+        let newArr:any[] = [];
+        MyArr.forEach((item) => {
+            let check = newArr.every((b) => {
+                return item.chain !== b.chain || item.address !== b.address || item.id !== b.id;
+            })
+            if(check){
+                return newArr.push(item)
+            }else{
+                return ''
+            }
+        })
+        let mylist = [...newArr];
+        setList(mylist.splice(0,5))
+        localStorage.setItem('history',JSON.stringify(newArr));
+    }
+
     const queryInfo = async() =>{
 
         if(Number(chainIdstr)!== Number(chainId) ) {
@@ -298,9 +362,8 @@ function Home() {
             return true;
         }
 
+        HistoryRecord()
         const contract1155 = new ethers.Contract(nftadd!, ERC1155_ABI, web3Provider);
-
-
         try{
             const isERC1155 = await contract1155?.supportsInterface('0xd9b67a26');
             if(isERC1155){
@@ -317,24 +380,6 @@ function Home() {
                 setErrorTips(false)
             },2000)
         }
-
-        // console.log(owner)
-        // const bal = await contract721.balanceOf(owner)
-        // console.log(bal)
-
-        // setType('');
-        // let res = await Api.getInfo(address);
-        // let ty = res?.data.schema_name;
-        // if(ty!== 'UNKNOWN'){
-        //     setType(ty);
-        // }else{
-        //     const contract721 = new ethers.Contract(address, ERC721_ABI, web3Provider);
-        //     console.log(contract721)
-        //     const owner = await contract721.ownerOf(token);
-        //     console.log(owner)
-        //     const bal = await contract721.balanceOf(owner)
-        //
-        // }
 
     }
 
@@ -444,6 +489,27 @@ function Home() {
 
     }
 
+    const clearhistory = (MyItem:any) =>{
+        let arr= localStorage.getItem('history');
+        let arrFormat = JSON.parse(arr!);
+        console.log(MyItem,)
+
+        const after = arrFormat.findIndex((item:any)=>item.id===MyItem.id && item.address === MyItem.address && item.chain === MyItem.chain);
+        console.log(after)
+        if(after>-1){
+            arrFormat.splice(after,1);
+            console.log(arrFormat)
+            // localStorage.setItem('history',JSON.stringify(arrFormat))
+            // setList()
+            console.log(arrFormat)
+        }
+
+    }
+
+    const toGONew = (url:string) =>{
+        navigate(url)
+    }
+
   return (
       <div>
         <MainContent>
@@ -479,103 +545,132 @@ function Home() {
                   </div>
               </TopLine>
             <Row>
+
                 <CardBox body>
-                    <CenterBox>
-                        <Col  md={8} xs={12}>
-                            <FloatingLabel
-                                controlId="Chain"
-                                label="Chain"
-                                className="mb-3"
-                            >
-                                <Form.Control
-                                    type="text"
-                                    name='address'
-                                    placeholder="Contract address"
-                                    value={chainName || chainIdstr}
-                                    readOnly
-                                />
-                            </FloatingLabel>
-                        </Col>
-                    </CenterBox>
-                    <CenterBox>
-                        <Col  md={8} xs={12}>
-                            <FloatingLabel
-                                controlId="Address"
-                                label="Contract address"
-                                className="mb-3"
-                            >
-                                <Form.Control
-                                    type="text"
-                                    name='address'
-                                    placeholder="Contract address"
-                                    value={address}
-                                    onChange={(e)=>handleInput(e)}
-                                />
-                                {
-                                    !!address && <button className="inner-btn" onClick={()=>clearInput('address')}>
-                                        <X />
-                                    </button>
-                                }
-                            </FloatingLabel>
-                        </Col>
-                    </CenterBox>
-                    <CenterBox>
-                        <Col  md={8} xs={12}>
-                            <FloatingLabel
-                                label="Token Id"
-                                className="mb-3"
-                            >
-                                <Form.Control
-                                    type="text"
-                                    name='token'
-                                    placeholder="Token Id"
-                                    value={token}
-                                    onChange={(e)=>handleInput(e)}
-                                />
-                                {
-                                    !!token && <button className="inner-btn" onClick={()=>clearInput('token')}>
-                                        <X />
-                                    </button>
-                                }
-                            </FloatingLabel>
-                        </Col>
-                    </CenterBox>
-                    <CenterBox>
-                        <Button variant="flat" onClick={()=>toGo()}>Resolve</Button>
-                    </CenterBox>
-                    <CenterBox>
-                        <Col  md={8} xs={12}>
-                            <GrayBox>
-                                <TypeTop>{type}</TypeTop>
-                                <NameBox>{name}</NameBox>
-                                <div>
-                                    Metadata: {metadata}
-                                </div>
-                                {
-                                    !!pArr.length &&<PBox>
-                                        <div>Properties: </div>
+
+                    <Row>
+                        <Col md={9} xs={12}>
+                            <CenterBox>
+                                <Col>
+                                    <FloatingLabel
+                                        controlId="Chain"
+                                        label="Chain"
+                                        className="mb-3"
+                                    >
+                                        <Form.Control
+                                            type="text"
+                                            name='address'
+                                            placeholder="Contract address"
+                                            value={chainName || chainIdstr}
+                                            readOnly
+                                        />
+                                    </FloatingLabel>
+                                </Col>
+                            </CenterBox>
+                            <CenterBox>
+                                <Col>
+                                    <FloatingLabel
+                                        controlId="Address"
+                                        label="Contract address"
+                                        className="mb-3"
+                                    >
+                                        <Form.Control
+                                            type="text"
+                                            name='address'
+                                            placeholder="Contract address"
+                                            value={address}
+                                            onChange={(e)=>handleInput(e)}
+                                        />
                                         {
-                                            pArr.map((item)=>(<dl className="tabBox" key={item.name}>
-                                                    <dt>{item.name}</dt>
-                                                    <dd>{item.value}</dd>
-                                                </dl>
-                                            ))
+                                            !!address && <button className="inner-btn" onClick={()=>clearInput('address')}>
+                                                <X />
+                                            </button>
+                                        }
+                                    </FloatingLabel>
+                                </Col>
+                            </CenterBox>
+                            <CenterBox>
+                                <Col >
+                                    <FloatingLabel
+                                        label="Token Id"
+                                        className="mb-3"
+                                    >
+                                        <Form.Control
+                                            type="text"
+                                            name='token'
+                                            placeholder="Token Id"
+                                            value={token}
+                                            onChange={(e)=>handleInput(e)}
+                                        />
+                                        {
+                                            !!token && <button className="inner-btn" onClick={()=>clearInput('token')}>
+                                                <X />
+                                            </button>
+                                        }
+                                    </FloatingLabel>
+                                </Col>
+                            </CenterBox>
+                            <CenterBox>
+                                <Button variant="flat" onClick={()=>toGo()}>Resolve</Button>
+                            </CenterBox>
+                            <CenterBox>
+                                <Col>
+                                    <GrayBox>
+                                        <TypeTop>{type}</TypeTop>
+                                        <NameBox>{name}</NameBox>
+                                        <div>
+                                            Metadata: {metadata}
+                                        </div>
+                                        {
+                                            !!pArr.length &&<PBox>
+                                                <div>Properties: </div>
+                                                {
+                                                    pArr.map((item)=>(<dl className="tabBox" key={item.name}>
+                                                            <dt>{item.name}</dt>
+                                                            <dd>{item.value}</dd>
+                                                        </dl>
+                                                    ))
+                                                }
+
+                                            </PBox>
                                         }
 
-                                    </PBox>
-                                }
-
-                                {
-                                   !svgShow && <ImageBox>
-                                        <img src={image} alt=""/>
-                                    </ImageBox>
-                                }
-                                {
-                                    svgShow && <ImageBox dangerouslySetInnerHTML={{__html: image}} />
-                                }
-                            </GrayBox>
+                                        {
+                                            !svgShow && <ImageBox>
+                                                <img src={image} alt=""/>
+                                            </ImageBox>
+                                        }
+                                        {
+                                            svgShow && <ImageBox dangerouslySetInnerHTML={{__html: image}} />
+                                        }
+                                    </GrayBox>
+                                </Col>
+                            </CenterBox>
                         </Col>
-                    </CenterBox>
+                        <Col md={3} xs={12}>
+                            <HistoryBox>
+                                <div className="titleRht">History</div>
+                                <ul>
+                                    {
+                                        !!list.length && list.map((item,index)=>( <li key={index}>
+                                            <div className="close" onClick={()=>clearhistory(item)}>
+                                                {getName(item.chain)} --{item.id}
+                                                <X />
+                                            </div>
+                                            <div onClick={()=>toGONew(`/${item.chain}/${item.address}/${item.id}`)}>
+                                                {
+                                                    `${window.location.host}/nft-checker/${item.chain}/${item.address}/${item.id}`
+                                                }
+                                            </div>
+
+                                        </li>))
+                                    }
+
+                                </ul>
+                            </HistoryBox>
+                        </Col>
+                    </Row>
+
                 </CardBox>
             </Row>
           </ContentBox>
