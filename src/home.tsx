@@ -413,7 +413,7 @@ function Home() {
         const nftContract = new ethers.Contract(nftadd!, ERC721_ABI, web3Provider);
         const tokenURI = await nftContract.tokenURI(id);
         setMetadata(tokenURI);
-        console.log(tokenURI)
+
 
         if(tokenURI.indexOf('metadata')>-1){
             let data = await api.getData(tokenURI);
@@ -423,7 +423,6 @@ function Home() {
             setName(data.data?.name);
             setSvgShow(false)
         }else if(tokenURI.indexOf('svg')>-1){
-            console.error(tokenURI)
             setImage(tokenURI);
             setSvgShow(true)
         }else{
@@ -436,18 +435,24 @@ function Home() {
                 url =tokenURI;
             }
             const result = await api.getHash(`${url}`);
+
             setName(result.data?.name);
             setProperties(result.data?.properties)
             let image;
             let imageUrl;
             if(result.data?.image.indexOf("ipfs://")>-1){
               image = result.data?.image.split("ipfs://")[1];
-              imageUrl = `https://ipfs.io/ipfs/${image}`;
+                let str;
+              if(image.startsWith("ipfs/")){
+                  str =  image.split("ipfs/")[1]
+              }else{
+                  str = image
+              }
+              imageUrl = `https://ipfs.io/ipfs/${str}`;
             }else{
                 image = result.data?.image;
                 imageUrl = image;
             }
-
             setSvgShow(false)
             setImage(imageUrl);
         }
@@ -486,11 +491,17 @@ function Home() {
             setMetadata(tokenURI);
             let image;
             let imageUrl;
-            console.log(result.data?.image)
+
             setName(result.data?.name);
             if(result.data?.image.indexOf('ipfs')>-1){
                 image = result.data?.image.split("ipfs://")[1];
-                 imageUrl = `https://ipfs.io/ipfs/${image}`;
+                let str;
+                if(image.startsWith("ipfs/")){
+                    str =  image.split("ipfs/")[1]
+                }else{
+                    str = image
+                }
+                imageUrl = `https://ipfs.io/ipfs/${str}`;
             }else{
                 image = result.data?.image;
                 imageUrl = image;
